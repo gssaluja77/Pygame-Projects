@@ -138,13 +138,116 @@ def game_loop():
                 #     mixer.music.set_volume(0.2)
                 #     mixer.music.play()
                 #     game_over = True
-                pygame.draw.rect(
-                    screen, RED, pygame.Rect(food_x, food_y, snake_size, snake_size)
+                # Draw fancy apple-like food
+                # Main apple body (red circle)
+                pygame.draw.circle(
+                    screen,
+                    RED,
+                    (int(food_x + snake_size / 2), int(food_y + snake_size / 2)),
+                    int(snake_size / 2),
                 )
-                for x, y in snake_list:
-                    pygame.draw.rect(
-                        screen, WHITE, pygame.Rect(x, y, snake_size, snake_size)
+                # Apple highlight (lighter red)
+                pygame.draw.circle(
+                    screen,
+                    (255, 100, 100),
+                    (
+                        int(food_x + snake_size / 2 - 3),
+                        int(food_y + snake_size / 2 - 3),
+                    ),
+                    int(snake_size / 4),
+                )
+                # Apple stem (brown)
+                pygame.draw.rect(
+                    screen,
+                    (101, 67, 33),
+                    pygame.Rect(food_x + snake_size / 2 - 2, food_y - 3, 4, 5),
+                )
+
+                # Draw fancy snake body with gradient effect
+                for i, (x, y) in enumerate(snake_list):
+                    # Create gradient from tail to head
+                    if i == len(snake_list) - 1:
+                        # This is the head - draw it separately below
+                        pass
+                    else:
+                        # Body segments - gradient from darker to lighter green
+                        progress = i / max(len(snake_list) - 1, 1)
+                        # Gradient from darker green to lighter green
+                        color_r = int(50 + (150 * progress))
+                        color_g = int(200 + (55 * progress))
+                        color_b = int(50 + (50 * progress))
+                        segment_color = (color_r, color_g, color_b)
+
+                        # Draw circular body segments
+                        pygame.draw.circle(
+                            screen,
+                            segment_color,
+                            (int(x + snake_size / 2), int(y + snake_size / 2)),
+                            int(snake_size / 2),
+                        )
+                        # Add a darker outline
+                        pygame.draw.circle(
+                            screen,
+                            (30, 100, 30),
+                            (int(x + snake_size / 2), int(y + snake_size / 2)),
+                            int(snake_size / 2),
+                            2,
+                        )
+                        # Add a small highlight for 3D effect
+                        pygame.draw.circle(
+                            screen,
+                            (200, 255, 200),
+                            (int(x + snake_size / 2 - 2), int(y + snake_size / 2 - 2)),
+                            int(snake_size / 5),
+                        )
+
+                # Draw fancy snake head (last element)
+                if snake_list:
+                    head_x, head_y = snake_list[-1]
+                    head_center_x = int(head_x + snake_size / 2)
+                    head_center_y = int(head_y + snake_size / 2)
+
+                    # Main head (bright green)
+                    pygame.draw.circle(
+                        screen,
+                        (100, 255, 100),
+                        (head_center_x, head_center_y),
+                        int(snake_size / 2),
                     )
+                    # Head outline
+                    pygame.draw.circle(
+                        screen,
+                        (30, 150, 30),
+                        (head_center_x, head_center_y),
+                        int(snake_size / 2),
+                        2,
+                    )
+
+                    # Draw eyes based on direction
+                    eye_offset = 4
+                    eye_size = 3
+
+                    if flag == 1:  # Moving up
+                        left_eye_pos = (head_center_x - eye_offset, head_center_y - 2)
+                        right_eye_pos = (head_center_x + eye_offset, head_center_y - 2)
+                    elif flag == 2:  # Moving down
+                        left_eye_pos = (head_center_x - eye_offset, head_center_y + 2)
+                        right_eye_pos = (head_center_x + eye_offset, head_center_y + 2)
+                    elif flag == 3:  # Moving left
+                        left_eye_pos = (head_center_x - 2, head_center_y - eye_offset)
+                        right_eye_pos = (head_center_x - 2, head_center_y + eye_offset)
+                    elif flag == 4:  # Moving right
+                        left_eye_pos = (head_center_x + 2, head_center_y - eye_offset)
+                        right_eye_pos = (head_center_x + 2, head_center_y + eye_offset)
+                    else:  # Default (not moving yet)
+                        left_eye_pos = (head_center_x - eye_offset, head_center_y - 2)
+                        right_eye_pos = (head_center_x + eye_offset, head_center_y - 2)
+
+                    # Draw eyes (white with black pupils)
+                    pygame.draw.circle(screen, WHITE, left_eye_pos, eye_size)
+                    pygame.draw.circle(screen, BLACK, left_eye_pos, eye_size - 1)
+                    pygame.draw.circle(screen, WHITE, right_eye_pos, eye_size)
+                    pygame.draw.circle(screen, BLACK, right_eye_pos, eye_size - 1)
 
                 text_on_screen(f"Score: {score}", GREEN, 30, 20, 20, True, True)
                 text_on_screen(
